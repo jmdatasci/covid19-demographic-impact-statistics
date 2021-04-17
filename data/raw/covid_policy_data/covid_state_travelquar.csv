@@ -1,0 +1,52 @@
+﻿state,postcode,fips,QMST,QMAT,QM_END
+Alabama,AL,1,0,0,0
+Alaska,AK,2,0,3/25/2020,2/14/2021
+Arizona,AZ,4,4/9/2020,0,5/12/2020
+Arkansas,AR,5,5/5/2020,0,6/15/2020
+California,CA,6,0,0,0
+Colorado,CO,8,0,0,0
+Connecticut,CT,9,6/25/2020,0,3/19/2021
+Delaware,DE,10,0,3/30/2020,6/1/2020
+District of Columbia,DC,11,7/27/2020,0,0
+Florida,FL,12,3/24/2020,0,8/5/2020
+Georgia,GA,13,0,0,0
+Hawaii,HI,15,0,3/26/2020,0
+Idaho,ID,16,0,4/15/2020,5/16/2020
+Illinois,IL,17,0,0,0
+Indiana,IN,18,0,0,0
+Iowa,IA,19,0,0,0
+Kansas,KS,20,3/23/2020,0,0
+Kentucky,KY,21,0,4/2/2020,5/6/2020
+Louisiana,LA,22,0,0,0
+Maine,ME,23,6/12/2020,4/3/2020,0
+Maryland,MD,24,12/17/2020,0,0
+Massachusetts,MA,25,7/1/2020,3/27/2020,3/22/2021
+Michigan,MI,26,0,0,0
+Minnesota,MN,27,0,0,0
+Mississippi,MS,28,0,0,0
+Missouri,MO,29,0,0,0
+Montana,MT,30,0,3/30/2020,6/1/2020
+Nebraska,NE,31,0,0,0
+Nevada,NV,32,0,0,0
+New Hampshire,NH,33,11/15/2020,0,0
+New Jersey,NJ,34,0,0,0
+New Mexico,NM,35,9/4/2020,7/1/2020,2/11/2021
+New York,NY,36,6/25/2020,0,0
+North Carolina,NC,37,0,0,0
+North Dakota,ND,38,3/28/2020,0,9/21/2020
+Ohio,OH,39,0,0,0
+Oklahoma,OK,40,3/29/2020,0,5/12/2020
+Oregon,OR,41,0,0,0
+Pennsylvania,PA,42,0,11/20/2020,0
+Rhode Island,RI,44,3/26/2020,3/28/2020,0
+South Carolina,SC,45,3/27/2020,0,5/4/2020
+South Dakota,SD,46,0,0,0
+Tennessee,TN,47,0,0,0
+Texas,TX,48,3/26/2020,0,0
+Utah,UT,49,0,4/10/2020,5/1/2020
+Vermont,VT,50,6/8/2020,3/30/2020,0
+Virginia,VA,51,0,0,0
+Washington,WA,53,0,0,0
+West Virginia,WV,54,3/31/2020,0,5/21/2020
+Wisconsin,WI,55,0,0,0
+Wyoming,WY,56,0,4/3/2020,5/8/2020

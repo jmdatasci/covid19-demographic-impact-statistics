@@ -1,0 +1,5 @@
+COVID-19 US state policy database 3_26_2021.xlsx - www.tinyurl.com/statepolicies
+Actual: https://docs.google.com/spreadsheets/d/1zu9qEWI8PsOI_i8nI_S29HDGHlIp2lfVMsGxpQ5tvAQ/edit#gid=973655443
+COVID-19 US state policy database 3_26_2021.csv - csv copy of data from excel source file
+Covid19_USState_PolicyDB_032621_attrtypeadd.csv - Justin Peabody updated data categories
+Covid19_USState_PolicyDB_032621.csv - data records for each state
