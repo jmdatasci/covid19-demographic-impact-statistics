@@ -1,0 +1,112 @@
+---
+title: "Untitled"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#install.packages("kableExtra")
+#install.packages("pastecs")
+library(tidyverse)
+library(lubridate)
+library(knitr)
+library(kableExtra)
+library(pastecs)
+library(data.table)
+library(readxl)
+#install.packages("formattable")
+library(formattable)
+```
+
+```{r}
+# print(colnames(main_df), quote=FALSE,right=FALSE)
+main_df_sub <- main_df %>% select(Total.Population,Percent.White,Percent.Hispanic.Or.Latino,cases,Recreation,Grocery,Parks,Transit,Workplace,Residential,Days.Stay.At.Home,Days.With.Mask,Days.Restaurant.Closed,Days.Bar.Closed,Days.Gym.Closed,Days.Nonessential.Closed,state.land.sq.mile,Percent.Poverty,Religious.Event.Exempt,Cases.Per.100k,Percent.Person.Of.Color)
+
+main_df_sub <- main_df %>% 
+select(state, Cases.Per.100k,Percent.Person.Of.Color,Percent.Hispanic.Or.Latino,Residential,Workplace,Transit,Parks,Grocery,Percent.Poverty,Days.Stay.At.Home,Days.With.Mask,Days.Restaurant.Closed,Days.Bar.Closed,Days.Gym.Closed,Days.Nonessential.Closed) %>%
+  rename(
+    Cases.Per.100K=Cases.Per.100k,
+    Percent.People.Of.Color=Percent.Person.Of.Color,
+    Days.Nonesst.Buss.Closed=Days.Nonessential.Closed,
+    Park=Parks
+  )
+
+#Dataframe with fields - Main Df
+attach(main_df_sub)
+options(scipen=100)
+options(digits=2)
+#Numerous outputs
+stat.desc(main_df_sub)-> main_df_sum
+
+#Transpose to create columns/fields for descriptive statistics
+transpose(main_df_sum)-> main_df_sum_stat
+rownames(main_df_sum) -> colnames(main_df_sum_stat)
+colnames(main_df_sum) -> rownames(main_df_sum_stat)
+main_df_sum_stat
+main_df_sum_stat <- rownames_to_column(main_df_sum_stat, "Field")
+
+colnames(main_df_sum_stat)
+
+main_df_sum_stat2<-main_df_sum_stat %>%
+select (Field,min,max,median,mean,std.dev,nbr.null) %>%
+  rename(nbr.0.val=nbr.null) %>% filter(Field!="state")
+#write_csv(main_df_sum_stat, "test_stat_table.csv")
+
+main_df_sum_stat2 <- main_df_sum_stat2 %>% left_join(primary_dataset,c("Field"="Variable name")) %>% 
+  select(Field,Description,min,max,median,mean,std.dev,nbr.0.val) %>%
+  rename("Variable Name"=Field)
+```
+```{r}
+#Read Metadata Excel to Dataframe
+#library(readxl)
+excel_sheets("../../data/processed/metadata.xlsx")
+read_excel("../../data/processed/metadata.xlsx", sheet = "primary_dataset")->primary_dataset
+read_excel("../../data/processed/metadata.xlsx", sheet = "mobility_variables")->mobility_variables
+read_excel("../../data/processed/metadata.xlsx", sheet = "mobility_raw")->mobility_raw
+read_excel("../../data/processed/metadata.xlsx", sheet = "census_raw")->census_raw
+read_excel("../../data/processed/metadata.xlsx", sheet = "nyt_times_variables")->nyt_times_variables
+read_excel("../../data/processed/metadata.xlsx", sheet = "state_policy_variables")->state_policy_variables
+read_excel("../../data/processed/metadata.xlsx", sheet = "state_policy_raw")->state_policy_raw
+```
+```{r}
+#Testing Kable
+print(primary_dataset[1])
+# main_df_sum_stat_sub <- main_df_sum_stat  %>% select(Field,min,max,median,mean,std.dev)
+
+write_csv(main_df_sum_stat2,"../../../lab_2/test_output_stats.cvs")
+read_csv("../../../lab_2/test_output_stats.cvs")->test
+
+#Need to connect metadata from Excel to the main_df to connect definitions and updated variable names
+kbl(main_df_sum_stat2, caption = "Variable Summary") %>%
+  kable_classic() %>%
+  #kable_paper("striped", full_width = F) %>%
+  pack_rows("NY Times and Census", 1,3) %>%
+  pack_rows("Google Community Mobility",4,9) %>%
+  pack_rows("State Policy",10,15)
+```
+
+
+```{r}
+kbl(nyt_times_variables) %>%
+  kable_material() %>%
+  column_spec(1, width="1cm")
+
+kbl(mobility_variables) %>%
+  kable_classic()
+
+kbl(mobility_raw) %>%
+  kable_classic()
+
+kbl(census_raw) %>%
+  kable_classic()
+
+kbl(state_policy_variables) %>%
+  kable_classic()
+
+kbl(state_policy_raw) %>%
+  kable_classic()
+```
+

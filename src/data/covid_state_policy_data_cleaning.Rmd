@@ -1,0 +1,226 @@
+---
+title: "COVID Policy Data CSV to Dataframe Script Notebook"
+output: pdf_document
+---
+
+```{r load packages, message=FALSE}
+library(tidyverse)
+library(lubridate)
+library(data.table)
+theme_set(theme_minimal())
+knitr::opts_chunk$set(dpi = 300)
+```
+
+
+```{r}
+#Change to your home path; Justin to update
+getwd()
+setwd("C:/Users/justi/OneDrive/Desktop/cbstats203/Lab_2_Aswin_Jordan_Justin_Leon/notebooks/")
+```
+
+
+```{r}
+#Boston University COVID-19 US State Policy database
+cv19p_df<-read.csv("../../data/raw/covid_policy_data/COVID-19 US state policy database 3_26_2021.csv")
+cv19p_df<-data.frame(cv19p_df)
+#Updated column name which was transformed in CSV
+cv19p_df <- cv19p_df %>% rename(STATE=ï..STATE)
+#Keep Policy Data State Records
+cv19p_df_values=cv19p_df[5:55,]#Records attribute details are for States
+row.names(cv19p_df_values)<-1:nrow(cv19p_df_values)#Update Index
+#States Data Records into CSV
+write.csv(cv19p_df_values,file="../../data/raw/covid_policy_data/Covid19_USState_PolicyDB_032621.csv",row.names=FALSE)
+```
+
+```{r}
+#Next 3 Code Sections create formatted dataframe for proper data types
+cv19p_df2 <- read.csv("../../data/raw/covid_policy_data/Covid19_USState_PolicyDB_032621.csv")
+cv19p_df2_q <- read.csv("../../data/raw/covid_policy_data/covid_state_travelquar.csv")
+cv19p_df2_q <- cv19p_df2_q %>% #Updated column name which was transformed in CSV
+  rename(state=ï..state)
+cv19p_df2 <- cv19p_df2 %>% left_join(cv19p_df2_q, by= c("FIPS"="fips"))
+```
+
+```{r}
+#Format attributes to correct format for analysis
+cv19p_df2 <- cv19p_df2 %>%
+  mutate(
+    POPDEN18=as.numeric(POPDEN18),
+    SQML=as.numeric(gsub(",","",SQML)),
+    POV18=as.numeric(POV18),
+    STAYHOME=mdy(STAYHOME), #Date stay at home ordered
+    END_STHM=mdy(END_STHM), #Date stay at home ended
+    FM_ALL=mdy(FM_ALL), #Date face mask in public mandated
+    FM_END=mdy(FM_END), #Date face mask mandate end
+    CLREST=mdy(CLREST), #Date restaurant closed
+    ENDREST=mdy(ENDREST), #Date restaurant reopened
+    CLRST2=mdy(CLRST2), #2nd Date restaurant closed
+    ENDREST2=mdy(ENDREST2), #2nd Date restaurant reopened
+    CLSCHOOL=mdy(CLSCHOOL), #Close K to 12
+    CLGYM=mdy(CLGYM), #Close Gym
+    ENDGYM=mdy(ENDGYM), #End Closed Gym 1
+    CLGYM2=mdy(CLGYM2), #Close Gym 2
+    END_CLGYM2=mdy(END_CLGYM2), #End Close Gym 2
+    CLOSEBAR=mdy(CLOSEBAR), #Close Bar
+    END_BRS=mdy(END_BRS), #End Close Bars 1
+    CLBAR2=mdy(CLBAR2), #Close Bar 2
+    END_BRS2=mdy(END_BRS2), #End Bars Close 2
+    END_RELG=mdy(END_RELG), #End religious closures
+    QMST=mdy(QMST), #Quarantine mandate some travel
+    QMAT=mdy(QMAT), #Quarantine mandate all travel
+    QM_END=mdy(QM_END), #end quarantine travel mandate -NEED TO FIX attribute name
+    CLBSNS=mdy(CLBSNS), #closed other non-essential businesses
+    END_BSNS=mdy(END_BSNS), #begin to reopen non-essential businesses
+    QMST=mdy(QMST),
+    QMAT=mdy(QMAT),
+    QM_END=mdy(QM_END),
+    QMT=mdy(coalesce(QMAT,QMST))
+  )
+
+cv19p_df2 <- cv19p_df2 %>%
+  mutate(
+    STAYHOME=coalesce(STAYHOME, as.Date("2029-12-31")),
+    END_STHM=coalesce(END_STHM, as.Date("2029-12-31")),
+    FM_ALL=coalesce(FM_ALL, as.Date("2029-12-31")),
+    FM_END=coalesce(FM_END, as.Date("2029-12-31")),
+    CLREST=coalesce(CLREST, as.Date("2029-12-31")),
+    ENDREST=coalesce(ENDREST, as.Date("2029-12-31")),
+    CLRST2=coalesce(CLRST2, as.Date("2029-12-31")),
+    ENDREST2=coalesce(ENDREST2, as.Date("2029-12-31")),
+    CLSCHOOL=coalesce(CLSCHOOL, as.Date("2029-12-31")),
+    CLGYM=coalesce(CLGYM, as.Date("2029-12-31")),
+    ENDGYM=coalesce(ENDGYM, as.Date("2029-12-31")),
+    CLGYM2=coalesce(CLGYM2, as.Date("2029-12-31")),
+    END_CLGYM2=coalesce(END_CLGYM2, as.Date("2029-12-31")),
+    CLOSEBAR=coalesce(CLOSEBAR, as.Date("2029-12-31")),
+    END_BRS=coalesce(END_BRS, as.Date("2029-12-31")),
+    CLBAR2=coalesce(CLBAR2, as.Date("2029-12-31")),
+    END_BRS2=coalesce(END_BRS2, as.Date("2029-12-31")),
+    END_RELG=coalesce(END_RELG, as.Date("2029-12-31")),
+    QMST=coalesce(QMST, as.Date("2029-12-31")),
+    QMAT=coalesce(QMAT, as.Date("2029-12-31")),
+    QM_END=coalesce(QM_END, as.Date("2029-12-31")),
+    CLBSNS=coalesce(CLBSNS, as.Date("2029-12-31")),
+    END_BSNS=coalesce(END_BSNS, as.Date("2029-12-31")),
+    QMST=coalesce(QMST, as.Date("2029-12-31")),
+    QMAT=coalesce(QMAT, as.Date("2029-12-31")),
+    QM_END=coalesce(QM_END, as.Date("2029-12-31"))
+  )
+
+#Update Montana and Wyoming - FM_ALL
+cv19p_df2["27","FM_ALL"]=as.Date("2020-07-15")
+cv19p_df2["51","FM_ALL"]=as.Date("2020-12-09")
+
+#Update Stay at Home 
+cv19p_df2["7","STAYHOME"]=as.Date("2020-03-23") #Connecticut
+cv19p_df2["18","STAYHOME"]=as.Date("2020-03-26") #Kentucky
+#cv19p_df2["37","STAYHOME"]=as.Date() #Oklahoma - no stay at home order so left 0
+cv19p_df2["44","STAYHOME"]=as.Date("2020-04-02") #Texas
+cv19p_df2["32","END_STHM"]=as.Date("2020-05-15") #New Mexico
+
+#Update Population and Pop Density - from google sheets - missing in spreadsheet
+cv19p_df2["9","POP18"]=702455 #Washington DC
+cv19p_df2["9","POPDEN18"]=11496.81 #Washington DC
+cv19p_df2["31","POPDEN18"]=1021.27 #New Jersey
+```
+
+
+```{r}
+filter_end_date=as.Date('2020-12-14')
+
+cv19p_sub <- cv19p_df2 %>%
+  select(STATE,
+        POSTCODE,POPDEN18,POP18,SQML,RELIGEX,POV18,FIPS,
+        STAYHOME,END_STHM,FM_ALL,FM_END,CLREST,ENDREST,CLRST2,ENDREST2,CLSCHOOL,CLGYM,ENDGYM,
+        CLGYM2,END_CLGYM2,CLOSEBAR,END_BRS,CLBAR2,END_BRS2,STAYHOME,END_STHM,
+        END_RELG,QMST,QMAT,QMT,QM_END,CLBSNS,END_BSNS
+         ) %>%
+  rename(
+    statecode=POSTCODE,
+    state.land.sq.mile=SQML,
+    percent.poverty=POV18,
+    religious.event.exempt=RELIGEX
+  )
+
+# cv19p_sub %>% rowwise() %>%
+#   mutate(FM_END_2=min(FM_END,as.Date(filter_end_date)))
+
+cv19p_sub <- cv19p_sub %>%
+  mutate(
+    FM_END_2=case_when(FM_END<=filter_end_date ~ FM_END, FM_END>filter_end_date ~ filter_end_date),
+    ENDREST_2=case_when(ENDREST<=filter_end_date ~ ENDREST, ENDREST>filter_end_date ~ filter_end_date),
+    ENDREST2_2=case_when(ENDREST2<=filter_end_date ~ ENDREST2,ENDREST2>filter_end_date ~ filter_end_date),
+    ENDGYM_2=case_when(ENDGYM<=filter_end_date ~ ENDGYM,ENDGYM>filter_end_date ~ filter_end_date),
+    END_CLGYM2_2=case_when(END_CLGYM2<=filter_end_date ~ END_CLGYM2,END_CLGYM2>filter_end_date ~ filter_end_date),
+    END_BRS_2=case_when(END_BRS<=filter_end_date ~ END_BRS,END_BRS>filter_end_date ~ filter_end_date),
+    END_BRS2_2=case_when(END_BRS2<=filter_end_date ~ END_BRS2,END_BRS2>filter_end_date ~ filter_end_date),
+    END_STHM_2=case_when(END_STHM<=filter_end_date ~ END_STHM,END_STHM>filter_end_date ~ filter_end_date),
+    END_RELG_2=case_when(END_RELG<=filter_end_date ~ END_RELG,END_RELG>filter_end_date ~ filter_end_date),
+    QM_END_2=case_when(QM_END<=filter_end_date ~ QM_END,QM_END>filter_end_date ~ filter_end_date),
+    END_BSNS_2=case_when(END_BSNS<=filter_end_date ~ END_BSNS,END_BSNS>filter_end_date ~ filter_end_date),
+    CLGYM2_2=case_when(CLGYM2<=filter_end_date ~ CLGYM2,CLGYM2>filter_end_date ~ filter_end_date),
+    CLBAR2_2=case_when(CLBAR2<=filter_end_date ~ CLBAR2,CLBAR2>filter_end_date ~ filter_end_date),
+    CLRST2_2=case_when(CLRST2<=filter_end_date ~ CLRST2,CLGYM2>filter_end_date ~ filter_end_date)
+      )
+
+cv19p_sub[cv19p_sub=="2029-12-31"]<-NA
+
+#cv19p_sub <- replace_na(as.Date("2022-12-31"))
+#min(END_REST_2, filter_end_date)
+
+cv19p_sub <- cv19p_sub %>%
+  mutate(
+  DRCp1_2020=as.numeric(difftime(ENDREST_2,CLREST,units="days")),
+  DRCp2_2020=as.numeric(difftime(ENDREST2_2,CLRST2_2,units="days")),
+  DBCp1_2020=as.numeric(difftime(END_BRS_2,CLOSEBAR,units="days")),
+  DBCp2_2020=as.numeric(difftime(END_BRS2_2,CLBAR2_2,units="days")),
+  DGCp1_2020=as.numeric(difftime(ENDGYM_2,CLGYM,unit="days")),
+  DGCp2_2020=as.numeric(difftime(END_CLGYM2_2,CLGYM2_2,unit="days")),
+  days.with.mask=coalesce(as.numeric(difftime(FM_END_2,FM_ALL,units="days")),0),
+  days.gym.closed=coalesce(DGCp1_2020,0)+coalesce(DGCp2_2020,0),
+  days.stay.at.home=coalesce(as.numeric(difftime(END_STHM_2,STAYHOME,unit="days")),0),
+  days.restaurant.closed=coalesce(DRCp1_2020,0)+coalesce(DRCp2_2020,0),
+  days.bar.closed=coalesce(DBCp1_2020,0)+coalesce(DBCp2_2020,0),
+  days.travel.quar=coalesce(as.numeric(difftime(QM_END_2,QMT,unit="days")),0),
+  days.nonesst.bus.closed=coalesce(as.numeric(difftime(END_BSNS_2,CLBSNS,unit="days")),0)
+  )
+
+cv19p_sub <- lownames(cv19p_sub) #lower case names
+
+write.csv(cv19p_sub,file="../../data/processed/state_policy_attrs.csv",row.names=FALSE)
+```
+
+```{r}
+#Validate
+# new <- cv19p_sub %>%
+#           select(
+#             state,
+#             statecode,
+#             fips,
+#             days.stay.at.home,
+#             days.with.mask,
+#             days.restaurant.closed,
+#             days.bar.closed,
+#             days.gym.closed,
+#             days.nonesst.bus.closed,
+#             state.land.sq.mile,
+#             percent.poverty,
+#             religious.event.exempt)
+# 
+# old<-read.csv("../../data/processed/Covid19_USState_Policy_modelattr.csv")
+# 
+# new %>% inner_join(old, by="state") %>%
+# mutate(
+#   maskdiff=days.with.mask-dwm_2020,
+#   bardiff=days.bar.closed-dbc_2020,
+#   restdiff=days.restaurant.closed-drc_2020,
+#   gymdiff=days.gym.closed-dgc_2020,
+#   busdiff=days.nonesst.bus.closed-dnbc_2020
+# ) %>%
+# select (state,maskdiff,bardiff,restdiff,gymdiff,busdiff)
+# 
+# cv19p_sub_4 %>% select(state,pop18,sqml,popden18)
+# cv19p_sub_4 %>% select(state,end_sthm_2,end_sthm,stayhome,dsh_2020)
+# cv19p_sub_4 %>% select(state,fm_end,fm_end_2,fm_all,dwm_2020)
+# cv19p_sub_4 %>% select(state,qm_end_2,qm_end,qmst,qmat,qmt,dtq_2020)
+```

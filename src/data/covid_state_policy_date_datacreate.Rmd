@@ -1,0 +1,72 @@
+---
+title: "State Policy Dates Dataframe"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(tidyverse)
+library(lubridate)
+```
+
+
+```{r}
+#Policy Dataframe
+pid<-c(1,2,3,4,5,6)
+pid
+policy<-c("stayhome","restaurant","bars","gym","nonessentialbus","masks")
+policy_df<-data.frame(pid,policy)
+policy_df$pid <- as.numeric(policy_df$pid)
+
+```
+
+```{r}
+statepolicydates<-data.frame()
+cv19p_sub["37","end_sthm"]=NA
+
+for (i in 1:dim(cv19p_sub)) {
+
+stateplot<-cv19p_sub %>% filter(state==cv19p_sub$state[i])
+
+stay<-data.frame(date=seq(coalesce(as.Date(stateplot$stayhome),as.Date("2020-12-14")),coalesce(as.Date(stateplot$end_sthm),as.Date("2020-12-15")), by = "day"))
+stay<-data.frame(append(stay, c(policy_df[1,])))
+
+rest1<-data.frame(date=seq(coalesce(as.Date(stateplot$clrest),as.Date("2020-12-14")),coalesce(as.Date(stateplot$endrest),as.Date("2020-12-15")), by = "day"))
+rest2<-data.frame(date=seq(coalesce(as.Date(stateplot$clrst2),as.Date("2020-12-14")),coalesce(as.Date(stateplot$endrest2),as.Date("2021-01-01")), by = "day"))
+rest<-rbind(rest1,rest2)
+rest<-data.frame(append(rest, c(policy_df[2,])))
+
+bars1<-data.frame(date=seq(coalesce(as.Date(stateplot$closebar),as.Date("2020-12-14")),coalesce(as.Date(stateplot$end_brs),as.Date("2020-12-15")), by = "day"))
+bars2<-data.frame(date=seq(coalesce(as.Date(stateplot$clbar2),as.Date("2020-12-14")),coalesce(as.Date(stateplot$end_brs2),as.Date("2020-12-15")), by = "day"))
+bars<-rbind(bars1,bars2)
+bars<-data.frame(append(bars, c(policy_df[3,])))
+
+gym1<-data.frame(date=seq(coalesce(as.Date(stateplot$clgym),as.Date("2020-12-14")),coalesce(as.Date(stateplot$endgym),as.Date("2020-12-15")), by = "day"))
+gym2<-data.frame(date=seq(coalesce(as.Date(stateplot$clgym2),as.Date("2020-12-14")),coalesce(as.Date(stateplot$end_clgym2),as.Date("2020-12-15")), by = "day"))
+gym<-rbind(gym1,gym2)
+gym<-data.frame(append(gym, c(policy_df[4,])))
+
+bus<-data.frame(date=seq(coalesce(as.Date(stateplot$clbsns),as.Date("2020-12-14")),coalesce(as.Date(stateplot$end_bsns),as.Date("2020-12-15")), by = "day"))
+bus<-data.frame(append(bus, c(policy_df[5,])))
+ 
+mask<-data.frame(date=seq(coalesce(as.Date(stateplot$fm_all),as.Date("2020-12-14")),coalesce(as.Date(stateplot$fm_end_2),as.Date("2020-12-15")), by = "day"))
+mask<-data.frame(append(mask, c(policy_df[6,])))
+
+statepoldates<-rbind(stay,rest,bars,gym,bus,mask)
+statepoldates<-data.frame(append(statepoldates, c(stateplot$state)))
+colnames(statepoldates)[4] <- "state"
+
+statepolicydates<-rbind(statepolicydates,statepoldates)
+}
+
+#write.csv(statepolicydates,"../data/raw/covid_policy_data/state_policy_dates.csv",row.names = FALSE)
+```
+
+```{r}
+read.csv("../data/raw/covid_policy_data/state_policy_dates.csv")->statepolicy
+statepolicy$date<-as.Date(statepolicy$date)
+```

@@ -1,0 +1,57 @@
+---
+title: "COVID Policy Data CSV to Dataframe Script Notebook"
+output: pdf_document
+---
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE, dpi = 300)
+```
+
+
+```{r load packages, message=FALSE}
+library(tidyverse)
+library(lubridate)
+library(data.table)
+theme_set(theme_minimal())
+
+```
+
+
+```{r}
+#Change to your home path; Justin to update
+getwd()
+setwd("C:/Users/justi/OneDrive/Desktop/cbstats203/Lab_2_Aswin_Jordan_Justin_Leon/notebooks/")
+```
+
+
+```{r}
+#Boston University COVID-19 US State Policy database
+cv19p_df<-read.csv("../../data/raw/covid_policy_data/COVID-19 US state policy database 3_26_2021.csv")
+cv19p_df<-data.frame(cv19p_df)
+cv19p_df <- cv19p_df %>% rename(STATE=ï..STATE) #Updated column name which was transformed in CSV
+#First 4 records create an Attributes description Data Frame
+cv19p_df_attributedetails<-data.frame(cv19p_df[1:4,])#SEE Attributes Code for Attribute Dictionary
+```
+
+
+```{r}
+#Attribute Dictionary Data Frame
+cv19p_df_attr<-transpose(cv19p_df_attributedetails)
+rownames(cv19p_df_attr) <- colnames(cv19p_df_attributedetails)
+cv19p_df_attr <- cv19p_df_attr %>%
+  rename(
+    Description=V1,
+    AttrCat=V2,
+    AttrType=V3,
+    AttrDataType=V4
+  )
+cv19p_df_attr <- cv19p_df_attr %>% rownames_to_column("AttributeName")
+
+#Created Custom of Broader Categories - Justin Peabody
+read.csv("../../data/raw/covid_policy_data/Covid19_USState_PolicyDB_032621_attrtypeadd.csv") -> cv19p_df_attr_add
+cv19p_df_attr_add <- cv19p_df_attr_add %>% 
+  rename(AttributeName=ï..ATTR)
+cv19p_df_attr_add <- unique(cv19p_df_attr_add)
+cv19p_df_attr <- cv19p_df_attr %>% inner_join(cv19p_df_attr_add,by="AttributeName") #Final Attribute Dataset
+write.csv(cv19p_df_attr,file="../../data/raw/covid_policy_data/Covid19_USState_PolicyDB_032621_attrlist.csv")
+```
