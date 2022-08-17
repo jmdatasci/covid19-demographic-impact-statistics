@@ -1,6 +1,3 @@
-lab_2
-==============================
-
 The final project for MIDS w203: an exploration of the features that show relationships between policies, mobility, demographics and increased or decreased state-level COVID cases. 
 
 Project Organization
